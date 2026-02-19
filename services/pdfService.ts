@@ -1,3 +1,4 @@
+
 import { jsPDF } from 'jspdf';
 import { RowData } from '../types';
 import { ASHA_LOGO_BASE64 } from '../components/logoBase64.js';
@@ -44,7 +45,8 @@ function numberToWords(num: number): string {
   return inWords(Math.floor(num));
 }
 
-export const generateInvoicePDF = async (billNumber: string, allData: RowData[]) => {
+// Updated generateInvoicePDF to return File for sharing
+export const generateInvoicePDF = async (billNumber: string, allData: RowData[]): Promise<File | undefined> => {
   const items = allData.filter(r => r['Bill Number'] === billNumber);
   if (items.length === 0) return;
 
@@ -291,5 +293,32 @@ export const generateInvoicePDF = async (billNumber: string, allData: RowData[])
   doc.setTextColor(brandBlue[0], brandBlue[1], brandBlue[2]);
   doc.text("us at support@theashaindustries.com", margin, termsY + 23);
 
-  doc.save(`Invoice_${billNumber}.pdf`);
+  // Output blob to create File object
+  const pdfBlob = doc.output('blob');
+  const filename = `Invoice_${billNumber}.pdf`;
+  doc.save(filename);
+  
+  return new File([pdfBlob], filename, { type: 'application/pdf' });
+};
+
+// Implemented shareToWhatsApp for direct invoice sharing
+export const shareToWhatsApp = (file: File, billNumber: string) => {
+  const message = `Asha Fan Industries - Invoice for Bill ${billNumber}`;
+  
+  // Try using Native Sharing if available (especially for mobile)
+  if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+    navigator.share({
+      files: [file],
+      title: 'Invoice',
+      text: message,
+    }).catch(err => {
+      console.warn("Share failed, falling back to basic link", err);
+      const url = `https://wa.me/?text=${encodeURIComponent(message)}`;
+      window.open(url, '_blank');
+    });
+  } else {
+    // Fallback: Open WhatsApp with text (browser doesn't support sharing local files via URL easily)
+    const url = `https://wa.me/?text=${encodeURIComponent(message)}`;
+    window.open(url, '_blank');
+  }
 };

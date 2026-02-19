@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Dealer, Item, RowData } from '../types';
 
@@ -9,6 +10,7 @@ interface ItemEntry {
 
 interface QuickEntryFormProps {
   onAdd: (rows: RowData[]) => void;
+  showManualDateTime?: boolean;
 }
 
 const DEALERS: Dealer[] = [
@@ -74,7 +76,7 @@ const ITEMS: Item[] = [
   { name: 'Room Heater', hsn: '8516' }
 ].sort((a, b) => a.name.localeCompare(b.name));
 
-const QuickEntryForm: React.FC<QuickEntryFormProps> = ({ onAdd }) => {
+const QuickEntryForm: React.FC<QuickEntryFormProps> = ({ onAdd, showManualDateTime = false }) => {
   const [dealerIdx, setDealerIdx] = useState<string>('');
   const [billNo, setBillNo] = useState('');
   const [vehicleNo, setVehicleNo] = useState('');
@@ -128,18 +130,14 @@ const QuickEntryForm: React.FC<QuickEntryFormProps> = ({ onAdd }) => {
       ? cleanedBillNo 
       : `AFI-0${cleanedBillNo}`;
 
-    // Date & Time Logic
     const now = new Date();
-    // Indian Standard Time Formatting
     const currentIstDate = now.toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata', day: '2-digit', month: '2-digit', year: 'numeric' }).replace(/\//g, '-');
     const currentIstTime = now.toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit', hour12: true });
 
-    // Handle manual inputs or fallback to defaults
     let finalDate = manualDate;
     if (!finalDate) {
       finalDate = currentIstDate;
-    } else {
-      // If user provided a date via <input type="date">, it's YYYY-MM-DD. Let's make it DD-MM-YYYY for our display.
+    } else if (showManualDateTime) {
       const dParts = finalDate.split('-');
       if (dParts.length === 3 && dParts[0].length === 4) {
         finalDate = `${dParts[2]}-${dParts[1]}-${dParts[0]}`;
@@ -149,8 +147,7 @@ const QuickEntryForm: React.FC<QuickEntryFormProps> = ({ onAdd }) => {
     let finalTime = manualTime;
     if (!finalTime) {
       finalTime = currentIstTime;
-    } else {
-      // Convert HTML time input (24h) to 12h format
+    } else if (showManualDateTime) {
       const [hours, minutes] = finalTime.split(':');
       const h = parseInt(hours);
       const ampm = h >= 12 ? 'pm' : 'am';
@@ -234,27 +231,31 @@ const QuickEntryForm: React.FC<QuickEntryFormProps> = ({ onAdd }) => {
           />
         </div>
 
-        <div className="space-y-1">
-          <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Date (Manual)</label>
-          <input 
-            type="date"
-            className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-indigo-500"
-            value={manualDate}
-            onChange={(e) => setManualDate(e.target.value)}
-          />
-          <p className="text-[9px] text-slate-400 italic">Leave empty for today (IST)</p>
-        </div>
+        {showManualDateTime && (
+          <>
+            <div className="space-y-1 animate-in fade-in slide-in-from-top-2 duration-300">
+              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Date (Manual)</label>
+              <input 
+                type="date"
+                className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-indigo-500"
+                value={manualDate}
+                onChange={(e) => setManualDate(e.target.value)}
+              />
+              <p className="text-[9px] text-slate-400 italic">Leave empty for today (IST)</p>
+            </div>
 
-        <div className="space-y-1">
-          <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Time (Manual)</label>
-          <input 
-            type="time"
-            className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-indigo-500"
-            value={manualTime}
-            onChange={(e) => setManualTime(e.target.value)}
-          />
-          <p className="text-[9px] text-slate-400 italic">Leave empty for current (IST)</p>
-        </div>
+            <div className="space-y-1 animate-in fade-in slide-in-from-top-2 duration-300">
+              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Time (Manual)</label>
+              <input 
+                type="time"
+                className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-indigo-500"
+                value={manualTime}
+                onChange={(e) => setManualTime(e.target.value)}
+              />
+              <p className="text-[9px] text-slate-400 italic">Leave empty for current (IST)</p>
+            </div>
+          </>
+        )}
       </div>
 
       <div className="space-y-4 mb-6">
