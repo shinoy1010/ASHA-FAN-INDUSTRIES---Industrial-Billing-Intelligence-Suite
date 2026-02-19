@@ -2,8 +2,19 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { SpreadsheetState, AIActionResponse, AnalysisResponse } from "../types";
 
-// Always use process.env.API_KEY directly for initialization
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+/**
+ * Safely retrieves the API key from the environment variables.
+ */
+const getApiKey = (): string => {
+  try {
+    return (typeof process !== 'undefined' && process.env?.API_KEY) || 
+           (window as any).process?.env?.API_KEY || 
+           "";
+  } catch (e) {
+    console.warn("API_KEY access failed.");
+    return "";
+  }
+};
 
 /**
  * Transforms or edits data based on user instructions using gemini-3-pro-preview
@@ -12,6 +23,12 @@ export async function transformData(
   state: SpreadsheetState,
   instruction: string
 ): Promise<AIActionResponse> {
+  const apiKey = getApiKey();
+  if (!apiKey) throw new Error("API Key is missing. AI transformation unavailable.");
+
+  // Create instance inside the call to ensure fresh environment state
+  const ai = new GoogleGenAI({ apiKey });
+
   const response = await ai.models.generateContent({
     model: "gemini-3-pro-preview",
     contents: `
@@ -39,7 +56,6 @@ export async function transformData(
             type: Type.ARRAY,
             items: {
               type: Type.OBJECT,
-              // We use an open object since spreadsheet columns are dynamic
             },
             description: "The complete updated dataset.",
           },
@@ -53,8 +69,10 @@ export async function transformData(
     },
   });
 
-  const result = JSON.parse(response.text || "{}") as AIActionResponse;
-  return result;
+  const text = response.text;
+  if (!text) throw new Error("AI returned empty result.");
+  
+  return JSON.parse(text.trim()) as AIActionResponse;
 }
 
 /**
@@ -63,6 +81,11 @@ export async function transformData(
 export async function analyzeData(
   state: SpreadsheetState
 ): Promise<AnalysisResponse> {
+  const apiKey = getApiKey();
+  if (!apiKey) throw new Error("API Key is missing. Analysis feature disabled.");
+
+  const ai = new GoogleGenAI({ apiKey });
+
   const response = await ai.models.generateContent({
     model: "gemini-3-flash-preview",
     contents: `
@@ -85,5 +108,8 @@ export async function analyzeData(
     }
   });
 
-  return JSON.parse(response.text || "{}") as AnalysisResponse;
+  const text = response.text;
+  if (!text) throw new Error("AI returned empty analysis.");
+
+  return JSON.parse(text.trim()) as AnalysisResponse;
 }
