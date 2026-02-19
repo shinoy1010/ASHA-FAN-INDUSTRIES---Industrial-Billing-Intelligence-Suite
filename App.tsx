@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback } from 'react';
 import { RowData, SpreadsheetState } from './types';
 import Grid from './components/Grid';
@@ -74,24 +73,19 @@ const App: React.FC = () => {
   const handleQuickAdd = async (newRows: RowData[]) => {
     if (newRows.length === 0) return;
     
-    // Update state using a functional update to ensure we have the very latest data for PDF generation
-    setState(prev => {
-      const updatedData = [...newRows, ...prev.data];
-      
-      // We generate the PDF using the exact combined data we are about to set
-      const billNumber = newRows[0]['Bill Number'];
-      generateInvoicePDF(billNumber, updatedData).catch(err => {
-        console.error("PDF generation failed after quick add:", err);
-      });
-
-      return {
-        ...prev,
-        data: updatedData
-      };
-    });
+    // Update state
+    setState(prev => ({
+      ...prev,
+      data: [...newRows, ...prev.data]
+    }));
     
     setLastMessage("Bill generated and added to queue");
     setTimeout(() => setLastMessage(null), 3000);
+
+    // Auto-generate PDF for this bill
+    const billNumber = newRows[0]['Bill Number'];
+    const combinedData = [...newRows, ...state.data];
+    await generateInvoicePDF(billNumber, combinedData);
   };
 
   const exportCSV = () => {
