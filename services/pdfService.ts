@@ -63,7 +63,7 @@ export const generateInvoicePDF = async (billNumber: string, allData: RowData[])
   doc.text("Bill-Cash", pageWidth - margin, 15, { align: 'right' });
 
   // --- 2. COMPANY HEADER (Logo centered above Title) ---
-  const logoPath = 'components/logo.jpeg'; 
+  const logoPath = '../components/logo.jpeg'; 
   const logoBase64 = await fetchImageAsBase64(logoPath);
   
   const logoHeight = 9; 
