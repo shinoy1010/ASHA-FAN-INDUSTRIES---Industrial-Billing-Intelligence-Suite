@@ -1,5 +1,6 @@
 import { jsPDF } from 'jspdf';
 import { RowData } from '../types';
+import { ASHA_LOGO_BASE64 } from '../components/logoBase64.js';
 
 /**
  * Utility to fetch an image and convert it to Base64 for jsPDF
@@ -63,7 +64,7 @@ export const generateInvoicePDF = async (billNumber: string, allData: RowData[])
   doc.text("Bill-Cash", pageWidth - margin, 15, { align: 'right' });
 
   // --- 2. COMPANY HEADER (Logo centered above Title) ---
-  const logoPath = '../logo.jpeg'; 
+  const logoPath = ASHA_LOGO_BASE64; 
   const logoBase64 = await fetchImageAsBase64(logoPath);
   
   const logoHeight = 9; 
