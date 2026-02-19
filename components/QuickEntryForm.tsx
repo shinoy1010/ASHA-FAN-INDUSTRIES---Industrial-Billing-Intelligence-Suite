@@ -11,59 +11,8 @@ interface ItemEntry {
 interface QuickEntryFormProps {
   onAdd: (rows: RowData[]) => void;
   showManualDateTime?: boolean;
+  dealers: Dealer[];
 }
-
-const DEALERS: Dealer[] = [
-  { name: 'Verma Mechanical Works', location: 'Main Bazar, Thanesar, Kurukshetra 136118, Haryana', gst: '06AACFV3206B1ZT' },
-  { name: 'Bajaj Electrical', location: 'Ganaur, Haryana', gst: '06AHMPB2431M1ZG' },
-  { name: 'Kohli Electrical Traders', location: 'Yamuna Nagar, Haryana', gst: '06ACQPS7136P1ZN' },
-  { name: 'SHRI BALAJEE TRADERS', location: 'A – 224, SECTOR -11, VIJAY NAGAR, Ghaziabad, Uttar Pradesh, 201001', gst: '09ABKPN5499B1Z9' },
-  { name: 'Manish Auto Electrician & Electronics', location: 'Kapal Mochan Road, Sadhaura Yamuna Nagar, Haryana', gst: '06DGEPK5884H1Z2' },
-  { name: 'Dhaliwal Electronics', location: 'Ram Thali Smandha, Village Taranwali, Taranwali, Kaithal, Haryana', gst: 'Not Available' },
-  { name: 'SHIVA ENTERPRISES', location: 'Gaushala Road, Karnal, Haryana', gst: '06AKUPG4505G1Z6' },
-  { name: 'Shree Radha Steel', location: 'Near Railway Crossing, Ahluwalia Chowk, Kurukshetra, Haryana, 136118', gst: '06AQPPS9016D1ZL' },
-  { name: 'Shri Shyam Overseas', location: 'Shop no. 163 Kamla Market New Delhi - 110002', gst: '07ATAPS9744C1ZJ' },
-  { name: 'Guru Steel Works', location: 'Jagadhri, Haryana', gst: '06ALXPK0181G1ZX' },
-  { name: 'Sharma Mobile and Electronics', location: 'Biana Chowki, Near HP Petrol Pump, Biana, Haryana', gst: 'Not Available' },
-  { name: 'Rajat Electronics', location: 'Railway Road, Kurukshetra', gst: 'NA' },
-  { name: 'Luxmi Enterprises', location: 'Main Chowk, Mustafabad, HR', gst: '06AWBPK1635N2ZG' },
-  { name: 'VIKAS ELECTRICALS', location: '312/7, ANAND BHAWAN, ROORKEE ROAD BAGH KESHO DASS, MUZAFFARNAGAR, UP - 251001', gst: '09AMJPA6347H1ZZ' },
-  { name: 'Bajaj Electronics & Mobiles', location: 'Ladwa, Haryana', gst: '06BYYPB3079B1ZD' },
-  { name: 'Global Electronics', location: 'Bye Pass Road, Paonta Sahib, Himachal Pradesh', gst: '02AJRPB5440M1Z7' },
-  { name: 'Goyal Brothers', location: 'Thanesar, Kurukshetra 136118, Haryana', gst: '06AAFFG5747F1ZF' },
-  { name: 'Shree Bala Jee Traders', location: 'A-224 Sector 11 Vijaynager Partapbhiar, Ghaziabad (UP)', gst: '09ABKPN5499B1Z9' },
-  { name: 'Om Electronics', location: 'Ganaur, Haryana', gst: '06ACTPP6871H1ZW' },
-  { name: 'M.R. Furniture', location: 'Tehsil Road, Gohana, Sonipat, Haryana 131301', gst: '06AODPG0336A1ZU' },
-  { name: 'BATRA ELECTRONICS', location: 'LAJPAT RAI MARG GOLE MARKET, RISHIKESH, Dehradun, Uttarakhand, 249201', gst: '05CEDPB1795L1ZG' },
-  { name: 'Bajaj Steel Works', location: 'Karnal', gst: '06HPPK7062D1Z7' },
-  { name: 'Titu Electronics', location: 'M.C. Road, Ganaur, Sonipat, Haryana', gst: '06ADWPT1881F1ZZ' },
-  { name: 'Super Refrigeration', location: 'Railway Road, Panipat', gst: '06ABQPB7478J1Z5' },
-  { name: 'Bajaj Music', location: 'Haryana', gst: 'Not Available' },
-  { name: 'Hare Krishna Electrical', location: 'Sonipat, Haryana', gst: '06AZOPS3860K1ZP' },
-  { name: 'Siddhi Vinayak Enterprises', location: '5, Pipal Mandi, Dehradun, Uttrakhand', gst: '05BCQPS4420K1Z9' },
-  { name: 'Dua Radio Corporation', location: 'Shop No 32, Near Clock Tower, Karnal', gst: '06BOHPD2240F1ZJ' },
-  { name: 'Sardar Electronics Store', location: 'Samalkha, Haryana', gst: '06BGCPS3125D1ZS' },
-  { name: 'Bhagat Ram Electric Store', location: 'Matak Majri, Indri (Karnal), Haryana 132041', gst: '06ADNPL1580E1ZM' },
-  { name: 'HK Chirag', location: 'Sonipat, Haryana', gst: 'Not Available' },
-  { name: 'Bansal Electronics', location: 'Barara, Haryana', gst: '06ALMPB0095R1ZP' },
-  { name: 'Faiz Handloom', location: 'Vill & Post Heempur Buzurg, Chandpur (Bijnor) 246725, UP', gst: '09CQLPA4753R1Z4' },
-  { name: 'Chopra Electronics', location: 'Industrial Area, Nilokheri', gst: '06AFAPC5633E1Z2' },
-  { name: 'Karnal Gramophone House', location: 'Karnal 132001, Haryana', gst: '06ASHPK3086B1ZZ' },
-  { name: 'Rippy Electronic World', location: 'Barara Distt. Ambala, Haryana', gst: '06BFTPS0749P1ZG' },
-  { name: 'PUNJAB NATIONAL BANK', location: 'AIC RAMESH CHANDRА ВНАТТ (PF NO. 91203)', gst: '06AAАСРО165G4ZQ' },
-  { name: 'Prem Enterprises', location: 'Paonta Sahib, Himachal Pradesh', gst: '02AFPPC4772D1ZR' },
-  { name: 'Jai Radio & Watch Co.', location: 'Chowk Rd, Rishikesh, Uttrakhand', gst: '05ACDPB1880E1Z7' },
-  { name: 'Rambha Electronics', location: 'Karnal, Haryana', gst: '06ASCPS2044L1ZN' },
-  { name: 'Balaji Hindustan Enterprises', location: 'Panipat, Haryana', gst: '06AHZPA3849F1Z3' },
-  { name: 'Ganga Steel Furniture', location: 'Shop No. 28, Mahaveer Bazar, Saharanpur, U.P', gst: '09BQGPS5498P1ZK' },
-  { name: 'Nand Lal & Sons', location: 'Taraori, Haryana', gst: '06BDNPT2309G1ZG' },
-  { name: 'Kohli Electric Company', location: 'Yamuna Nagar, Haryana', gst: '06ADPPK5532R1ZU' },
-  { name: 'Industrial Suppliers and Engineers', location: 'Badri Nagar, Paonta Sahib, HP', gst: '02ACFPG5119B1ZG' },
-  { name: 'Ravi Kumar Jain', location: 'Saharanpur, U.P', gst: 'NA' },
-  { name: 'Shivam Furniture', location: 'Ganaur, Haryana', gst: '06BECPK5120E1Z3' },
-  { name: 'RK Electronics', location: 'Near Chilkana Chungi, Chilkana Road, Saharanpur, U.P', gst: '09AFVPJ3407L1ZX' },
-  { name: 'Gupta Enterprises', location: 'Shop no 37, Near Clock Tower, Karnal, Haryana, 132001', gst: '06AFMPG9727R1ZK' }
-].sort((a, b) => a.name.localeCompare(b.name));
 
 const ITEMS: Item[] = [
   { name: 'Pedestal Base, Pipe, Blade', hsn: '8414', defaultPrice: 600 },
@@ -76,7 +25,7 @@ const ITEMS: Item[] = [
   { name: 'Room Heater', hsn: '8516' }
 ].sort((a, b) => a.name.localeCompare(b.name));
 
-const QuickEntryForm: React.FC<QuickEntryFormProps> = ({ onAdd, showManualDateTime = false }) => {
+const QuickEntryForm: React.FC<QuickEntryFormProps> = ({ onAdd, showManualDateTime = false, dealers }) => {
   const [dealerIdx, setDealerIdx] = useState<string>('');
   const [billNo, setBillNo] = useState('');
   const [vehicleNo, setVehicleNo] = useState('');
@@ -124,7 +73,7 @@ const QuickEntryForm: React.FC<QuickEntryFormProps> = ({ onAdd, showManualDateTi
       return;
     }
     
-    const dealer = DEALERS[parseInt(dealerIdx)];
+    const dealer = dealers[parseInt(dealerIdx)];
     const cleanedBillNo = billNo.trim();
     const formattedBillNo = cleanedBillNo.toUpperCase().startsWith('AFI-0') 
       ? cleanedBillNo 
@@ -203,7 +152,7 @@ const QuickEntryForm: React.FC<QuickEntryFormProps> = ({ onAdd, showManualDateTi
             onChange={(e) => setDealerIdx(e.target.value)}
           >
             <option value="">Select Customer</option>
-            {DEALERS.map((d, i) => (
+            {dealers.map((d, i) => (
               <option key={i} value={i}>{d.name}</option>
             ))}
           </select>
