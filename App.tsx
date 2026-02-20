@@ -224,7 +224,7 @@ const App: React.FC = () => {
         <div className="flex items-center gap-4 shrink-0">
           <div className="flex gap-0.5">
             {['A', 'S', 'H', 'A'].map((char, i) => (
-              <div key={i} className="w-10 h-10 bg-[#E31E24] flex items-center justify-center text-white font-black text-2xl select-none">
+              <div key={i} className="w-10 h-10 bg-[#E31E24] flex items-center justify-center text-white font-black text-4xl select-none">
                 {char === 'S' ? <span className="font-mono scale-x-125">S</span> : char}
               </div>
             ))}
