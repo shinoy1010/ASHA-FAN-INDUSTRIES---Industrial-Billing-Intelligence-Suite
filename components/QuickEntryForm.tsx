@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Dealer, Item, RowData } from '../types';
 
 interface ItemEntry {
@@ -31,6 +31,17 @@ const QuickEntryForm: React.FC<QuickEntryFormProps> = ({ onAdd, showManualDateTi
   const [vehicleNo, setVehicleNo] = useState('');
   const [manualDate, setManualDate] = useState('');
   const [manualTime, setManualTime] = useState('');
+  
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const filteredDealers = useMemo(() => {
+    return dealers
+      .map((dealer, index) => ({ dealer, index }))
+      .filter(({ dealer }) => 
+        dealer.name.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+  }, [dealers, searchTerm]);
   
   const [entries, setEntries] = useState<ItemEntry[]>([
     { itemIdx: '', quantity: '', price: '' }
@@ -146,26 +157,71 @@ const QuickEntryForm: React.FC<QuickEntryFormProps> = ({ onAdd, showManualDateTi
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8 pb-6 border-b border-slate-100">
         <div className="space-y-1">
           <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Customer</label>
-          <select 
-            className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-sm font-medium focus:ring-2 focus:ring-indigo-500 transition-all cursor-pointer"
-            value={dealerIdx}
-            onChange={(e) => setDealerIdx(e.target.value)}
-          >
-            <option value="">Select Customer</option>
-            {dealers.map((d, i) => (
-              <option key={i} value={i}>{d.name}</option>
-            ))}
-          </select>
+          <div className="relative">
+            <div 
+              className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-sm font-medium focus-within:ring-2 focus-within:ring-indigo-500 transition-all cursor-pointer flex justify-between items-center"
+              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+            >
+              <span className={dealerIdx === '' ? 'text-slate-500' : 'text-slate-900 truncate'}>
+                {dealerIdx !== '' ? dealers[parseInt(dealerIdx)]?.name : 'Select Customer'}
+              </span>
+              <svg xmlns="http://www.w3.org/2000/svg" className={`h-4 w-4 text-slate-400 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </div>
+
+            {isDropdownOpen && (
+              <>
+                <div 
+                  className="fixed inset-0 z-10" 
+                  onClick={() => setIsDropdownOpen(false)}
+                />
+                <div className="absolute z-20 top-full left-0 right-0 mt-1 bg-white border border-slate-200 rounded-lg shadow-xl max-h-60 flex flex-col animate-in fade-in zoom-in-95 duration-100">
+                  <div className="p-2 border-b border-slate-100 sticky top-0 bg-white rounded-t-lg">
+                    <input
+                      type="text"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      placeholder="Search customer..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      onClick={(e) => e.stopPropagation()}
+                      autoFocus
+                    />
+                  </div>
+                  <div className="overflow-y-auto flex-1">
+                    {filteredDealers.length === 0 ? (
+                      <div className="px-4 py-3 text-sm text-slate-400 italic text-center">No customers found</div>
+                    ) : (
+                      filteredDealers.map(({ dealer, index }) => (
+                        <div
+                          key={index}
+                          className={`px-4 py-2.5 text-sm cursor-pointer hover:bg-indigo-50 transition-colors ${dealerIdx === index.toString() ? 'bg-indigo-50 text-indigo-700 font-medium' : 'text-slate-700'}`}
+                          onClick={() => {
+                            setDealerIdx(index.toString());
+                            setIsDropdownOpen(false);
+                            setSearchTerm('');
+                          }}
+                        >
+                          {dealer.name}
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
         </div>
 
         <div className="space-y-1">
           <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Bill No (Auto: AFI-0)</label>
           <input 
             type="text"
+            inputMode="numeric"
             className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-indigo-500"
             placeholder="e.g. 377"
             value={billNo}
-            onChange={(e) => setBillNo(e.target.value)}
+            onChange={(e) => setBillNo(e.target.value.replace(/\D/g, ''))}
           />
         </div>
 

@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState, useMemo } from 'react';
 import { Dealer } from '../types';
 
 interface CustomerManagerProps {
@@ -19,6 +19,22 @@ const CustomerManager: React.FC<CustomerManagerProps> = ({
   isSyncing,
   onBack 
 }) => {
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const filteredDealers = useMemo(() => {
+    if (!searchQuery.trim()) {
+      return dealers.map((dealer, idx) => ({ ...dealer, originalIndex: idx }));
+    }
+    
+    const query = searchQuery.toLowerCase();
+    return dealers
+      .map((dealer, idx) => ({ ...dealer, originalIndex: idx }))
+      .filter(dealer => 
+        dealer.name.toLowerCase().includes(query) ||
+        dealer.location.toLowerCase().includes(query) ||
+        dealer.gst.toLowerCase().includes(query)
+      );
+  }, [dealers, searchQuery]);
   return (
     <div className="flex flex-col h-full bg-white animate-in fade-in duration-300">
       <div className="px-6 py-4 border-b border-slate-200 flex items-center justify-between bg-slate-50">
@@ -36,6 +52,31 @@ const CustomerManager: React.FC<CustomerManagerProps> = ({
         </div>
         
         <div className="flex items-center gap-3">
+          <div className="relative group">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-slate-400 group-focus-within:text-indigo-500 transition-colors" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd" />
+              </svg>
+            </div>
+            <input
+              type="text"
+              placeholder="Search customers..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent w-64 transition-all shadow-sm"
+            />
+            {searchQuery && (
+              <button 
+                onClick={() => setSearchQuery('')}
+                className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                </svg>
+              </button>
+            )}
+          </div>
+
           <button 
             onClick={onSync}
             disabled={isSyncing}
@@ -86,15 +127,15 @@ const CustomerManager: React.FC<CustomerManagerProps> = ({
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-slate-200">
-                {dealers.length === 0 ? (
+                {filteredDealers.length === 0 ? (
                   <tr>
                     <td colSpan={4} className="px-6 py-12 text-center text-slate-400 italic">
-                      No customers found. Try "Sync from Drive".
+                      {searchQuery ? `No customers matching "${searchQuery}"` : 'No customers found. Try "Sync from Drive".'}
                     </td>
                   </tr>
                 ) : (
-                  dealers.map((dealer, idx) => (
-                    <tr key={`${dealer.name}-${idx}`} className="hover:bg-blue-50/30 transition-colors group animate-in slide-in-from-top-1 duration-200">
+                  filteredDealers.map((dealer, idx) => (
+                    <tr key={`${dealer.name}-${dealer.originalIndex}`} className="hover:bg-blue-50/30 transition-colors group animate-in slide-in-from-top-1 duration-200">
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-400 text-center">
                         {idx + 1}
                       </td>
@@ -103,7 +144,7 @@ const CustomerManager: React.FC<CustomerManagerProps> = ({
                           type="text" 
                           value={dealer.name}
                           placeholder="Enter Customer Name..."
-                          onChange={(e) => onUpdateDealer(idx, 'name', e.target.value)}
+                          onChange={(e) => onUpdateDealer(dealer.originalIndex, 'name', e.target.value)}
                           className="w-full h-full px-6 py-4 bg-transparent focus:bg-white focus:outline-none focus:ring-1 focus:ring-indigo-500 text-sm font-semibold text-slate-900 placeholder:text-slate-300"
                         />
                       </td>
@@ -112,7 +153,7 @@ const CustomerManager: React.FC<CustomerManagerProps> = ({
                           type="text" 
                           value={dealer.location}
                           placeholder="Enter Location..."
-                          onChange={(e) => onUpdateDealer(idx, 'location', e.target.value)}
+                          onChange={(e) => onUpdateDealer(dealer.originalIndex, 'location', e.target.value)}
                           className="w-full h-full px-6 py-4 bg-transparent focus:bg-white focus:outline-none focus:ring-1 focus:ring-indigo-500 text-sm text-slate-600 placeholder:text-slate-300"
                         />
                       </td>
@@ -121,7 +162,7 @@ const CustomerManager: React.FC<CustomerManagerProps> = ({
                           type="text" 
                           value={dealer.gst}
                           placeholder="Enter GSTIN..."
-                          onChange={(e) => onUpdateDealer(idx, 'gst', e.target.value)}
+                          onChange={(e) => onUpdateDealer(dealer.originalIndex, 'gst', e.target.value)}
                           className="w-full h-full px-6 py-4 bg-transparent focus:bg-white focus:outline-none focus:ring-1 focus:ring-indigo-500 text-sm font-mono text-indigo-700 placeholder:text-slate-300 uppercase"
                         />
                       </td>
