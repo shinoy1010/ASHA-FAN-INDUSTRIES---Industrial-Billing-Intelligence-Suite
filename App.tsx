@@ -10,6 +10,7 @@ import { INITIAL_DEALERS } from './data/customers';
 
 const SPREADSHEET_ID = '16RNsZlki_0W-4PKbGxae94e5f5jl7Abn';
 const SHEET_CSV_URL = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/export?format=csv`;
+const SHEET_EDIT_URL = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/edit`;
 
 const App: React.FC = () => {
   const [currentView, setCurrentView] = useState<'billing' | 'customers'>('billing');
@@ -161,27 +162,8 @@ const App: React.FC = () => {
     });
   };
 
-  const handleAddDealer = () => {
-    setDealers(prev => [{ name: '', location: '', gst: '' }, ...prev]);
-  };
-
-  const handleDeleteDealer = useCallback((idx: number) => {
-    const dealerToDelete = dealers[idx];
-    if (!dealerToDelete) return;
-
-    const name = dealerToDelete.name || 'this customer';
-    
-    if (window.confirm(`Are you sure you want to delete "${name}"? This will refresh the local customer directory.`)) {
-      setDealers(prev => prev.filter((_, i) => i !== idx));
-      setLastMessage({ text: `Customer directory updated locally. "${name}" removed.` });
-      setTimeout(() => setLastMessage(null), 3000);
-    }
-  }, [dealers]);
-
-  const handleSaveDealers = () => {
-    localStorage.setItem('asha_fan_dealers', JSON.stringify(dealers));
-    setLastMessage({ text: "Local customer changes saved to browser." });
-    setTimeout(() => setLastMessage(null), 4000);
+  const handleOpenDrive = () => {
+    window.open(SHEET_EDIT_URL, '_blank');
   };
 
   const handleQuickAdd = async (newRows: RowData[]) => {
@@ -292,9 +274,7 @@ const App: React.FC = () => {
             <CustomerManager 
               dealers={dealers} 
               onUpdateDealer={handleUpdateDealer} 
-              onAddDealer={handleAddDealer}
-              onDeleteDealer={handleDeleteDealer}
-              onSave={handleSaveDealers}
+              onManageDrive={handleOpenDrive}
               onSync={() => fetchFromGoogleSheets(false)}
               isSyncing={isSyncing}
               onBack={() => setCurrentView('billing')} 

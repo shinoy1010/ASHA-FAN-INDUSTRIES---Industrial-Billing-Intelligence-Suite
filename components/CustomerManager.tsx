@@ -5,9 +5,7 @@ import { Dealer } from '../types';
 interface CustomerManagerProps {
   dealers: Dealer[];
   onUpdateDealer: (index: number, field: keyof Dealer, value: string) => void;
-  onAddDealer: () => void;
-  onDeleteDealer: (index: number) => void;
-  onSave: () => void;
+  onManageDrive: () => void;
   onSync: () => void;
   isSyncing: boolean;
   onBack: () => void;
@@ -16,9 +14,7 @@ interface CustomerManagerProps {
 const CustomerManager: React.FC<CustomerManagerProps> = ({ 
   dealers, 
   onUpdateDealer, 
-  onAddDealer, 
-  onDeleteDealer, 
-  onSave,
+  onManageDrive, 
   onSync,
   isSyncing,
   onBack 
@@ -57,24 +53,13 @@ const CustomerManager: React.FC<CustomerManagerProps> = ({
           </button>
 
           <button 
-            onClick={onSave}
+            onClick={onManageDrive}
             className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg text-sm font-bold transition-all shadow-md active:scale-95"
-            title="Save local edits"
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-              <path d="M7.707 10.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V6h5a2 2 0 012 2v7a2 2 0 01-2 2H4a2 2 0 01-2-2V8a2 2 0 012-2h5v5.586l-1.293-1.293z" />
+              <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
             </svg>
-            Save Directory
-          </button>
-
-          <button 
-            onClick={onAddDealer}
-            className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-bold transition-all shadow-md active:scale-95"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-              <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
-            </svg>
-            Add New
+            Manage in Google Sheets
           </button>
         </div>
       </div>
@@ -98,13 +83,12 @@ const CustomerManager: React.FC<CustomerManagerProps> = ({
                   <th className="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider min-w-[250px]">Customer Name</th>
                   <th className="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Location / Address</th>
                   <th className="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider w-64">GST Number</th>
-                  <th className="px-6 py-3 text-center text-xs font-bold text-slate-500 uppercase tracking-wider w-24">Actions</th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-slate-200">
                 {dealers.length === 0 ? (
                   <tr>
-                    <td colSpan={5} className="px-6 py-12 text-center text-slate-400 italic">
+                    <td colSpan={4} className="px-6 py-12 text-center text-slate-400 italic">
                       No customers found. Try "Sync from Drive".
                     </td>
                   </tr>
@@ -132,7 +116,7 @@ const CustomerManager: React.FC<CustomerManagerProps> = ({
                           className="w-full h-full px-6 py-4 bg-transparent focus:bg-white focus:outline-none focus:ring-1 focus:ring-indigo-500 text-sm text-slate-600 placeholder:text-slate-300"
                         />
                       </td>
-                      <td className="px-6 py-2 p-0 border-r border-slate-100">
+                      <td className="px-6 py-2 p-0">
                         <input 
                           type="text" 
                           value={dealer.gst}
@@ -141,17 +125,6 @@ const CustomerManager: React.FC<CustomerManagerProps> = ({
                           className="w-full h-full px-6 py-4 bg-transparent focus:bg-white focus:outline-none focus:ring-1 focus:ring-indigo-500 text-sm font-mono text-indigo-700 placeholder:text-slate-300 uppercase"
                         />
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-center">
-                        <button 
-                          onClick={() => onDeleteDealer(idx)}
-                          className="p-2 text-slate-300 hover:text-red-600 hover:bg-red-100 rounded-lg transition-all active:scale-90"
-                          title="Delete locally"
-                        >
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                          </svg>
-                        </button>
-                      </td>
                     </tr>
                   ))
                 )}
@@ -159,7 +132,7 @@ const CustomerManager: React.FC<CustomerManagerProps> = ({
             </table>
           </div>
           <div className="mt-6 flex flex-col items-center gap-2">
-            <p className="text-xs text-slate-400 font-medium italic">Master list source: Google Drive. Edits here are local to this session until 'Saved'.</p>
+            <p className="text-xs text-slate-400 font-medium italic">Master list source: Google Drive. Click 'Manage in Google Sheets' to add or delete records permanently.</p>
             <p className="text-[10px] text-slate-300 uppercase tracking-widest font-bold">Cloud Synced via Asha Cloud v10.5</p>
           </div>
         </div>
