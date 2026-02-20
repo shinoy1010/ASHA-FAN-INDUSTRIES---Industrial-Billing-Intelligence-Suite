@@ -217,10 +217,10 @@ const App: React.FC = () => {
           </div>
         </div>
 
-        <div className="flex items-center gap-3 shrink-0 ml-auto">
+        <div className="flex items-center gap-3 w-full lg:w-auto overflow-x-auto lg:overflow-visible pb-2 lg:pb-0 lg:ml-auto no-print">
           <button 
             onClick={() => setIsAiPanelOpen(!isAiPanelOpen)}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all border ${
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all border whitespace-nowrap ${
               isAiPanelOpen 
                 ? 'bg-indigo-50 border-indigo-200 text-indigo-700 shadow-inner' 
                 : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
@@ -234,7 +234,7 @@ const App: React.FC = () => {
           
           <button 
             onClick={() => setShowManualDateTime(!showManualDateTime)}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all border ${
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all border whitespace-nowrap ${
               showManualDateTime 
                 ? 'bg-blue-50 border-blue-200 text-blue-700 shadow-inner' 
                 : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
@@ -248,7 +248,7 @@ const App: React.FC = () => {
 
           <button 
             onClick={() => setCurrentView(currentView === 'customers' ? 'billing' : 'customers')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all border ${
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all border whitespace-nowrap ${
               currentView === 'customers' 
                 ? 'bg-amber-50 border-amber-200 text-amber-700 shadow-inner' 
                 : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
@@ -260,9 +260,9 @@ const App: React.FC = () => {
             Customers
           </button>
 
-          <div className="w-px h-6 bg-slate-200 mx-1"></div>
+          <div className="w-px h-6 bg-slate-200 mx-1 shrink-0"></div>
           
-          <button onClick={exportCSV} className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-lg shadow-md shadow-indigo-100">
+          <button onClick={exportCSV} className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-lg shadow-md shadow-indigo-100 whitespace-nowrap">
             Export Records
           </button>
         </div>
