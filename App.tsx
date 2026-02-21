@@ -36,6 +36,7 @@ const App: React.FC = () => {
   const [lastMessage, setLastMessage] = useState<{ text: string, billNo?: string, file?: File | null } | null>(null);
   const [isAiPanelOpen, setIsAiPanelOpen] = useState(false);
   const [showManualDateTime, setShowManualDateTime] = useState(false);
+  const [isIGST, setIsIGST] = useState(false);
 
   // Function to fetch data from Google Sheets
   const fetchFromGoogleSheets = useCallback(async (silent = false) => {
@@ -176,7 +177,7 @@ const App: React.FC = () => {
     }));
     
     const combinedData = [...newRows, ...state.data];
-    const pdfFile = await generateInvoicePDF(billNumber, combinedData);
+    const pdfFile = await generateInvoicePDF(billNumber, combinedData, isIGST);
 
     setLastMessage({ 
       text: "Invoice ready for bill " + billNumber, 
@@ -244,6 +245,20 @@ const App: React.FC = () => {
               <path fillRule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clipRule="evenodd" />
             </svg>
             Adjust Date
+          </button>
+
+          <button 
+            onClick={() => setIsIGST(!isIGST)}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all border whitespace-nowrap ${
+              isIGST 
+                ? 'bg-purple-50 border-purple-200 text-purple-700 shadow-inner' 
+                : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
+            }`}
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className={`h-4 w-4 ${isIGST ? 'text-purple-600' : 'text-slate-400'}`} viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+            </svg>
+            IGST {isIGST ? '(On)' : '(Off)'}
           </button>
 
           <button 

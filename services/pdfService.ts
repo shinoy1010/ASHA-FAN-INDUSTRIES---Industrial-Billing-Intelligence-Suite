@@ -46,7 +46,7 @@ function numberToWords(num: number): string {
 }
 
 // Updated generateInvoicePDF to return File for sharing
-export const generateInvoicePDF = async (billNumber: string, allData: RowData[]): Promise<File | undefined> => {
+export const generateInvoicePDF = async (billNumber: string, allData: RowData[], isIGST: boolean = false): Promise<File | undefined> => {
   const items = allData.filter(r => r['Bill Number'] === billNumber);
   if (items.length === 0) return;
 
@@ -162,7 +162,17 @@ export const generateInvoicePDF = async (billNumber: string, allData: RowData[])
 
   // --- 5. MAIN TABLE ---
   const tableY = 130;
-  const colX_table = {
+  
+  // Define column positions based on IGST toggle
+  const colX_table = isIGST ? {
+    hash: margin,           
+    item: margin + 8,       
+    qty: margin + 45,       
+    price: margin + 65,      
+    taxable: margin + 88,   
+    igst: margin + 117,      
+    total: pageWidth - margin 
+  } : {
     hash: margin,           
     item: margin + 8,       
     qty: margin + 45,       
@@ -173,7 +183,9 @@ export const generateInvoicePDF = async (billNumber: string, allData: RowData[])
     total: pageWidth - margin 
   };
 
-  const totalColCenterX = (colX_table.sgst + 18 + colX_table.total) / 2;
+  const totalColCenterX = isIGST 
+    ? (colX_table.igst + 20 + colX_table.total) / 2 
+    : (colX_table.sgst + 18 + colX_table.total) / 2;
 
   doc.setFillColor(tableHeaderBg[0], tableHeaderBg[1], tableHeaderBg[2]);
   doc.rect(margin, tableY, pageWidth - (margin * 2), 18, 'F');
@@ -187,8 +199,14 @@ export const generateInvoicePDF = async (billNumber: string, allData: RowData[])
   doc.text("Quantity", colX_table.qty + 5, headTop, { align: 'center' });
   doc.text(["Price/Item", "(Rs.)"], colX_table.price + 10, headTop - 3, { align: 'center' });
   doc.text(["Taxable", "Value (Rs.)"], colX_table.taxable + 10, headTop - 3, { align: 'center' });
-  doc.text(["CGST", "(9%) (Rs.)"], colX_table.cgst + 10, headTop - 3, { align: 'center' });
-  doc.text(["SGST", "(9%) (Rs.)"], colX_table.sgst + 10, headTop - 3, { align: 'center' });
+  
+  if (isIGST) {
+    doc.text(["IGST", "(18%) (Rs.)"], colX_table.igst + 10, headTop - 3, { align: 'center' });
+  } else {
+    doc.text(["CGST", "(9%) (Rs.)"], colX_table.cgst + 10, headTop - 3, { align: 'center' });
+    doc.text(["SGST", "(9%) (Rs.)"], colX_table.sgst + 10, headTop - 3, { align: 'center' });
+  }
+  
   doc.text(["Total", "(Rs.)"], totalColCenterX, headTop - 3, { align: 'center' });
 
   let currentY = tableY + 23.5; 
@@ -201,10 +219,24 @@ export const generateInvoicePDF = async (billNumber: string, allData: RowData[])
     const qty = parseFloat(item['Quantity'] || '0');
     const price = parseFloat(item['Price'] || '0');
     const taxable = qty * price;
-    const cgst = taxable * 0.09;
-    const sgst = taxable * 0.09;
-    const total = taxable + cgst + sgst;
-    grandTotal += total;
+    
+    let total = 0;
+    
+    if (isIGST) {
+      const igst = taxable * 0.18;
+      total = taxable + igst;
+      grandTotal += total;
+      
+      doc.text(igst.toFixed(2), colX_table.igst + 10, currentY, { align: 'center' });
+    } else {
+      const cgst = taxable * 0.09;
+      const sgst = taxable * 0.09;
+      total = taxable + cgst + sgst;
+      grandTotal += total;
+      
+      doc.text(cgst.toFixed(2), colX_table.cgst + 10, currentY, { align: 'center' });
+      doc.text(sgst.toFixed(2), colX_table.sgst + 10, currentY, { align: 'center' });
+    }
 
     doc.text((index + 1).toString(), colX_table.hash + 2, currentY);
     const splitItem = doc.splitTextToSize(item['Item Name'] || 'N/A', 33);
@@ -217,8 +249,6 @@ export const generateInvoicePDF = async (billNumber: string, allData: RowData[])
     doc.text(qty.toString(), colX_table.qty + 5, currentY, { align: 'center' });
     doc.text(price.toFixed(2), colX_table.price + 10, currentY, { align: 'center' });
     doc.text(taxable.toFixed(2), colX_table.taxable + 10, currentY, { align: 'center' });
-    doc.text(cgst.toFixed(2), colX_table.cgst + 10, currentY, { align: 'center' });
-    doc.text(sgst.toFixed(2), colX_table.sgst + 10, currentY, { align: 'center' });
     doc.text(total.toFixed(2), totalColCenterX, currentY, { align: 'center' });
 
     currentY += Math.max(splitItem.length * 5.5 + 3, 11);
@@ -228,7 +258,9 @@ export const generateInvoicePDF = async (billNumber: string, allData: RowData[])
   doc.setFillColor(tableHeaderBg[0], tableHeaderBg[1], tableHeaderBg[2]);
   doc.rect(margin, summaryY, pageWidth - (margin * 2), 10, 'F');
   doc.setFont("helvetica", "bold");
-  doc.text("Total (Rs.)", colX_table.sgst - 5, summaryY + 6.5, { align: 'right' });
+  
+  const totalLabelX = isIGST ? colX_table.igst - 5 : colX_table.sgst - 5;
+  doc.text("Total (Rs.)", totalLabelX, summaryY + 6.5, { align: 'right' });
   doc.text(grandTotal.toFixed(2), totalColCenterX, summaryY + 6.5, { align: 'center' });
 
   doc.setFontSize(9);
@@ -236,6 +268,7 @@ export const generateInvoicePDF = async (billNumber: string, allData: RowData[])
   doc.text("Amount (In words)", margin, summaryY + 16);
   doc.setFont("helvetica", "bold");
   doc.text(numberToWords(grandTotal), pageWidth - margin, summaryY + 16, { align: 'right' });
+
 
   // --- 8. BANK ACCOUNT DETAILS ---
   doc.setTextColor(0);
