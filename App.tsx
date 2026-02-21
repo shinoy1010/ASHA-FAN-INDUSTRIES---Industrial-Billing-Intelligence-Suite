@@ -220,20 +220,6 @@ const App: React.FC = () => {
 
         <div className="flex items-center gap-3 w-full lg:w-auto overflow-x-auto lg:overflow-visible pb-2 lg:pb-0 lg:ml-auto no-print">
           <button 
-            onClick={() => setIsAiPanelOpen(!isAiPanelOpen)}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all border whitespace-nowrap ${
-              isAiPanelOpen 
-                ? 'bg-indigo-50 border-indigo-200 text-indigo-700 shadow-inner' 
-                : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
-            }`}
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className={`h-4 w-4 ${isAiPanelOpen ? 'text-indigo-600' : 'text-slate-400'}`} viewBox="0 0 20 20" fill="currentColor">
-              <path fillRule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clipRule="evenodd" />
-            </svg>
-            AI Assistant
-          </button>
-          
-          <button 
             onClick={() => setShowManualDateTime(!showManualDateTime)}
             className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all border whitespace-nowrap ${
               showManualDateTime 
@@ -279,6 +265,20 @@ const App: React.FC = () => {
           
           <button onClick={exportCSV} className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-lg shadow-md shadow-indigo-100 whitespace-nowrap">
             Export Records
+          </button>
+
+          <button 
+            onClick={() => setIsAiPanelOpen(!isAiPanelOpen)}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all border whitespace-nowrap ${
+              isAiPanelOpen 
+                ? 'bg-indigo-50 border-indigo-200 text-indigo-700 shadow-inner' 
+                : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
+            }`}
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className={`h-4 w-4 ${isAiPanelOpen ? 'text-indigo-600' : 'text-slate-400'}`} viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clipRule="evenodd" />
+            </svg>
+            AI Assistant
           </button>
         </div>
       </header>
