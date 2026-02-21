@@ -135,7 +135,7 @@ const CustomerManager: React.FC<CustomerManagerProps> = ({
                   </tr>
                 ) : (
                   filteredDealers.map((dealer, idx) => (
-                    <tr key={`${dealer.name}-${dealer.originalIndex}`} className="hover:bg-blue-50/30 transition-colors group animate-in slide-in-from-top-1 duration-200">
+                    <tr key={dealer.originalIndex} className="hover:bg-blue-50/30 transition-colors group animate-in slide-in-from-top-1 duration-200">
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-400 text-center">
                         {idx + 1}
                       </td>
