@@ -22,13 +22,15 @@ const Grid: React.FC<GridProps> = ({ columns, data, onCellEdit, onRowDelete }) =
     );
   }
 
+  const visibleColumns = columns.filter(col => col !== 'HSN');
+
   return (
     <div className="overflow-x-auto border border-slate-200 rounded-xl shadow-sm bg-white mb-8">
       <table className="min-w-full divide-y divide-slate-200 border-collapse">
         <thead className="bg-slate-50">
           <tr>
             <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider border-r border-slate-200 w-12">#</th>
-            {columns.map((col) => (
+            {visibleColumns.map((col) => (
               <th
                 key={col}
                 className="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider border-r border-slate-200 min-w-[150px]"
@@ -45,7 +47,7 @@ const Grid: React.FC<GridProps> = ({ columns, data, onCellEdit, onRowDelete }) =
               <td className="px-4 py-2 whitespace-nowrap text-sm font-medium text-slate-400 border-r border-slate-200 text-center">
                 {rowIndex + 1}
               </td>
-              {columns.map((col) => (
+              {visibleColumns.map((col) => (
                 <td key={col} className="px-6 py-2 whitespace-nowrap text-sm text-slate-700 border-r border-slate-200 p-0">
                   <input
                     type="text"

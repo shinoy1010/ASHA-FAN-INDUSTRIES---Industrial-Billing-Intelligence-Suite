@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { RowData, SpreadsheetState, Dealer } from './types';
+import { RowData, SpreadsheetState, Dealer, Item } from './types';
 import Grid from './components/Grid';
 import AIControlPanel from './components/AIControlPanel';
 import QuickEntryForm from './components/QuickEntryForm';
@@ -10,6 +10,7 @@ import { INITIAL_DEALERS } from './data/customers';
 
 const SPREADSHEET_ID = '16RNsZlki_0W-4PKbGxae94e5f5jl7Abn';
 const SHEET_CSV_URL = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/export?format=csv`;
+const ITEMS_CSV_URL = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:csv&sheet=items`;
 const SHEET_EDIT_URL = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/edit`;
 
 const App: React.FC = () => {
@@ -19,6 +20,8 @@ const App: React.FC = () => {
     data: [],
   });
   const [isSyncing, setIsSyncing] = useState(false);
+
+  const [items, setItems] = useState<Item[]>([]);
 
   // Initialize dealers from localStorage if available, otherwise use INITIAL_DEALERS
   const [dealers, setDealers] = useState<Dealer[]>(() => {
@@ -44,10 +47,14 @@ const App: React.FC = () => {
     if (!silent) setLastMessage({ text: "Connecting to Google Drive master list..." });
     
     try {
-      const response = await fetch(SHEET_CSV_URL);
-      if (!response.ok) throw new Error("Could not reach master spreadsheet.");
+      const [dealersResponse, itemsResponse] = await Promise.all([
+        fetch(SHEET_CSV_URL),
+        fetch(ITEMS_CSV_URL)
+      ]);
+
+      if (!dealersResponse.ok) throw new Error("Could not reach master spreadsheet.");
       
-      const csvText = await response.text();
+      const csvText = await dealersResponse.text();
       const lines = csvText.split(/\r?\n/).filter(line => line.trim() !== '');
       if (lines.length < 2) throw new Error("Spreadsheet appears to be empty.");
 
@@ -85,8 +92,34 @@ const App: React.FC = () => {
       if (newDealers.length > 0) {
         setDealers(newDealers);
         localStorage.setItem('asha_fan_dealers', JSON.stringify(newDealers));
-        if (!silent) setLastMessage({ text: `Successfully synced ${newDealers.length} customers from Google Sheets.` });
       }
+
+      // Process Items Sheet
+      if (itemsResponse.ok) {
+        const itemsCsvText = await itemsResponse.text();
+        const itemLines = itemsCsvText.split(/\r?\n/).filter(line => line.trim() !== '');
+        
+        if (itemLines.length > 1) {
+          const itemHeaders = parseCSVLine(itemLines[0]).map(h => h.toLowerCase());
+          const newItems: Item[] = itemLines.slice(1).map(line => {
+            const values = parseCSVLine(line);
+            const item: any = {};
+            itemHeaders.forEach((header, idx) => {
+              if (header.includes('name') || header.includes('item')) item.name = values[idx];
+              else if (header.includes('hsn')) item.hsn = values[idx];
+              else if (header.includes('price') || header.includes('rate')) item.defaultPrice = parseFloat(values[idx]);
+            });
+            return item as Item;
+          }).filter(i => i.name);
+          
+          if (newItems.length > 0) {
+            setItems(newItems);
+          }
+        }
+      }
+
+      if (!silent) setLastMessage({ text: `Successfully synced customers and items from Google Sheets.` });
+
     } catch (error) {
       console.error("Sync error:", error);
       if (!silent) setLastMessage({ text: "Failed to sync from Drive. Using offline list." });
@@ -298,7 +331,7 @@ const App: React.FC = () => {
         ) : (
           <>
             <section className="flex-1 flex flex-col p-6 overflow-y-auto bg-slate-50 relative scroll-smooth">
-              <QuickEntryForm onAdd={handleQuickAdd} showManualDateTime={showManualDateTime} dealers={dealers} />
+              <QuickEntryForm onAdd={handleQuickAdd} showManualDateTime={showManualDateTime} dealers={dealers} items={items} />
 
               <div className="flex items-center justify-end mb-4 no-print shrink-0">
                 <div className="text-xs font-bold text-slate-400 uppercase tracking-widest bg-white/50 px-3 py-1 rounded-full border border-slate-100">

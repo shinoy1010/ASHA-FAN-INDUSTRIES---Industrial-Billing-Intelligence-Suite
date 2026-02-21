@@ -37,8 +37,8 @@ const CustomerManager: React.FC<CustomerManagerProps> = ({
   }, [dealers, searchQuery]);
   return (
     <div className="flex flex-col h-full bg-white animate-in fade-in duration-300">
-      <div className="px-6 py-4 border-b border-slate-200 flex items-center justify-between bg-slate-50">
-        <div className="flex items-center gap-4">
+      <div className="px-6 py-4 border-b border-slate-200 flex flex-col md:flex-row items-center justify-between bg-slate-50 gap-4">
+        <div className="flex items-center gap-4 w-full md:w-auto justify-center md:justify-start">
           <button 
             onClick={onBack}
             className="p-2 hover:bg-slate-200 rounded-full transition-colors text-slate-600"
@@ -51,8 +51,8 @@ const CustomerManager: React.FC<CustomerManagerProps> = ({
           <h2 className="text-xl font-bold text-slate-900">Customer Directory</h2>
         </div>
         
-        <div className="flex items-center gap-3">
-          <div className="relative group">
+        <div className="flex flex-col md:flex-row items-center gap-3 w-full md:w-auto">
+          <div className="relative group w-full md:w-auto">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-slate-400 group-focus-within:text-indigo-500 transition-colors" viewBox="0 0 20 20" fill="currentColor">
                 <path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd" />
@@ -63,7 +63,7 @@ const CustomerManager: React.FC<CustomerManagerProps> = ({
               placeholder="Search customers..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent w-64 transition-all shadow-sm"
+              className="pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent w-full md:w-64 transition-all shadow-sm"
             />
             {searchQuery && (
               <button 
@@ -80,7 +80,7 @@ const CustomerManager: React.FC<CustomerManagerProps> = ({
           <button 
             onClick={onSync}
             disabled={isSyncing}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all border ${
+            className={`flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all border w-full md:w-auto ${
               isSyncing 
                 ? 'bg-slate-100 text-slate-400 cursor-not-allowed' 
                 : 'bg-white border-blue-200 text-blue-600 hover:bg-blue-50 shadow-sm'
@@ -95,7 +95,7 @@ const CustomerManager: React.FC<CustomerManagerProps> = ({
 
           <button 
             onClick={onManageDrive}
-            className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg text-sm font-bold transition-all shadow-md active:scale-95"
+            className="flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg text-sm font-bold transition-all shadow-md active:scale-95 w-full md:w-auto"
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
               <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />

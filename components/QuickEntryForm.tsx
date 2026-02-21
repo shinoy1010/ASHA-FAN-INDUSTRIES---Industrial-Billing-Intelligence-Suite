@@ -6,12 +6,14 @@ interface ItemEntry {
   itemIdx: string;
   quantity: string;
   price: string;
+  hsn: string;
 }
 
 interface QuickEntryFormProps {
   onAdd: (rows: RowData[]) => void;
   showManualDateTime?: boolean;
   dealers: Dealer[];
+  items?: Item[];
 }
 
 const ITEMS: Item[] = [
@@ -25,7 +27,7 @@ const ITEMS: Item[] = [
   { name: 'Room Heater', hsn: '8516' }
 ].sort((a, b) => a.name.localeCompare(b.name));
 
-const QuickEntryForm: React.FC<QuickEntryFormProps> = ({ onAdd, showManualDateTime = false, dealers }) => {
+const QuickEntryForm: React.FC<QuickEntryFormProps> = ({ onAdd, showManualDateTime = false, dealers, items = [] }) => {
   const [dealerIdx, setDealerIdx] = useState<string>('');
   const [billNo, setBillNo] = useState('');
   const [vehicleNo, setVehicleNo] = useState('');
@@ -34,6 +36,10 @@ const QuickEntryForm: React.FC<QuickEntryFormProps> = ({ onAdd, showManualDateTi
   
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+
+  const allItems = useMemo(() => {
+    return [...ITEMS, ...items];
+  }, [items]);
 
   const filteredDealers = useMemo(() => {
     return dealers
@@ -44,11 +50,11 @@ const QuickEntryForm: React.FC<QuickEntryFormProps> = ({ onAdd, showManualDateTi
   }, [dealers, searchTerm]);
   
   const [entries, setEntries] = useState<ItemEntry[]>([
-    { itemIdx: '', quantity: '', price: '' }
+    { itemIdx: '', quantity: '', price: '', hsn: '' }
   ]);
 
   const handleAddItemRow = () => {
-    setEntries(prev => [...prev, { itemIdx: '', quantity: '', price: '' }]);
+    setEntries(prev => [...prev, { itemIdx: '', quantity: '', price: '', hsn: '' }]);
   };
 
   const handleRemoveItemRow = (index: number) => {
@@ -63,8 +69,9 @@ const QuickEntryForm: React.FC<QuickEntryFormProps> = ({ onAdd, showManualDateTi
       newEntries[index] = { ...newEntries[index], [field]: value };
       
       if (field === 'itemIdx' && value !== '') {
-        const item = ITEMS[parseInt(value)];
+        const item = allItems[parseInt(value)];
         newEntries[index].price = item.defaultPrice?.toString() || '';
+        newEntries[index].hsn = item.hsn || '';
       }
       
       return newEntries;
@@ -116,7 +123,7 @@ const QuickEntryForm: React.FC<QuickEntryFormProps> = ({ onAdd, showManualDateTi
     }
 
     const newRows: RowData[] = validEntries.map(entry => {
-      const item = ITEMS[parseInt(entry.itemIdx)];
+      const item = allItems[parseInt(entry.itemIdx)];
       return {
         'Bill Number': formattedBillNo,
         'Date': finalDate,
@@ -125,7 +132,7 @@ const QuickEntryForm: React.FC<QuickEntryFormProps> = ({ onAdd, showManualDateTi
         'Location': dealer.location,
         'GST Number': dealer.gst,
         'Item Name': item.name,
-        'HSN': item.hsn,
+        'HSN': entry.hsn || item.hsn,
         'Quantity': entry.quantity,
         'Price': entry.price,
         'Vehicle No': vehicleNo.trim() || 'HR67D0177'
@@ -139,7 +146,7 @@ const QuickEntryForm: React.FC<QuickEntryFormProps> = ({ onAdd, showManualDateTi
     setVehicleNo('');
     setManualDate('');
     setManualTime('');
-    setEntries([{ itemIdx: '', quantity: '', price: '' }]);
+    setEntries([{ itemIdx: '', quantity: '', price: '', hsn: '' }]);
   };
 
   return (
@@ -279,7 +286,7 @@ const QuickEntryForm: React.FC<QuickEntryFormProps> = ({ onAdd, showManualDateTi
 
         {entries.map((entry, idx) => (
           <div key={idx} className="grid grid-cols-1 md:grid-cols-12 gap-3 items-end p-4 bg-slate-50/50 border border-slate-100 rounded-xl relative group animate-in slide-in-from-top-2 duration-300">
-            <div className="md:col-span-6 space-y-1">
+            <div className="md:col-span-7 space-y-1">
               <label className="text-[9px] font-bold text-slate-400 uppercase">Item Description</label>
               <select 
                 className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500"
@@ -287,7 +294,7 @@ const QuickEntryForm: React.FC<QuickEntryFormProps> = ({ onAdd, showManualDateTi
                 onChange={(e) => updateEntry(idx, 'itemIdx', e.target.value)}
               >
                 <option value="">Select Item</option>
-                {ITEMS.map((item, i) => (
+                {allItems.map((item, i) => (
                   <option key={i} value={i}>{item.name}</option>
                 ))}
               </select>
@@ -303,7 +310,7 @@ const QuickEntryForm: React.FC<QuickEntryFormProps> = ({ onAdd, showManualDateTi
               />
             </div>
 
-            <div className="md:col-span-3 space-y-1">
+            <div className="md:col-span-2 space-y-1">
               <label className="text-[9px] font-bold text-slate-400 uppercase">Price (₹)</label>
               <input 
                 type="number"
