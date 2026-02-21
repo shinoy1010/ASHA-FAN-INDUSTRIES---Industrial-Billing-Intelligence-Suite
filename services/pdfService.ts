@@ -135,7 +135,6 @@ export const generateInvoicePDF = async (billNumber: string, allData: RowData[],
   doc.setFont("helvetica", "normal");
   doc.text(headerRow['Dealer Name'] || 'N/A', margin, metaY + 6);
   doc.text(headerRow['Location'] || 'N/A', margin, metaY + 12);
-  doc.text("Haryana", margin, metaY + 18);
 
   doc.setFont("helvetica", "bold");
   doc.text("Customer GSTIN", margin, metaY + 28);
