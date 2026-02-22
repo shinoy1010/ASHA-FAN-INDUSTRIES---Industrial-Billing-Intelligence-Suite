@@ -69,8 +69,8 @@ export const generateInvoicePDF = async (billNumber: string, allData: RowData[],
   const logoPath = ASHA_LOGO_BASE64; 
   const logoBase64 = await fetchImageAsBase64(logoPath);
   
-  const logoHeight = 9; 
-  const logoWidth = 30;  
+  const logoHeight = 15; 
+  const logoWidth = 15;  
   const title = "ASHA FAN INDUSTRIES";
   
   // Vertical spacing

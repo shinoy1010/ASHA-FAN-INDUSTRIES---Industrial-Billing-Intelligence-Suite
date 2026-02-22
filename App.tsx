@@ -7,6 +7,7 @@ import QuickEntryForm from './components/QuickEntryForm';
 import CustomerManager from './components/CustomerManager';
 import { generateInvoicePDF, shareToWhatsApp } from './services/pdfService';
 import { INITIAL_DEALERS } from './data/customers';
+import { ASHA_LOGO_BASE64 } from './components/logoBase64';
 
 const SPREADSHEET_ID = '16RNsZlki_0W-4PKbGxae94e5f5jl7Abn';
 const SHEET_CSV_URL = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/export?format=csv`;
@@ -239,11 +240,7 @@ const App: React.FC = () => {
       <header className="bg-white border-b border-slate-200 px-6 py-4 flex flex-col lg:flex-row items-center justify-between shrink-0 z-10 shadow-sm gap-4 no-print">
         <div className="flex items-center gap-4 shrink-0">
           <div className="flex gap-0.5">
-            {['A', 'S', 'H', 'A'].map((char, i) => (
-              <div key={i} className="w-10 h-10 bg-[#E31E24] flex items-center justify-center text-white font-black text-4xl select-none">
-                {char === 'S' ? <span className="font-mono scale-x-125">S</span> : char}
-              </div>
-            ))}
+            <img src={ASHA_LOGO_BASE64} alt="Asha Fan Industries" className="h-12 w-auto object-contain" />
           </div>
           <div className="cursor-pointer" onClick={() => setCurrentView('billing')}>
             <h1 className="text-xl font-bold text-slate-900 leading-tight uppercase tracking-tight">ASHA FAN INDUSTRIES</h1>
